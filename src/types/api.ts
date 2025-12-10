@@ -20,6 +20,27 @@ export interface Restaurant {
     translations: Translation[];
 }
 
+export interface Spot {
+    id: number;
+    slug: string;
+    status: string;
+    image: string;
+    image_link: string | null;
+    translations: Translation[];
+}
+
+export interface SpotsApiResponse {
+    data: Spot[];
+    success: boolean;
+    message: string;
+    meta?: {
+        total: number;
+        per_page: number;
+        current_page: number;
+        last_page: number;
+    };
+}
+
 export interface ApiResponse {
     data: Restaurant[];
     success: boolean;

@@ -44,7 +44,7 @@ Author url: https://themeforest.net/user/website_stock/portfolio
 
 /* 1.1: Variables */
 :root {
-  --primary: #2196F3;
+  --primary: #ff4500;
   --secondary: #F6F8FE;
   --primary-text: #111111;
   --secondary-text: #78828A;
@@ -1490,11 +1490,11 @@ body,
 /*===========================================================
 26: dark-mode CSS
 =============================================================*/
-.dark-mode .wrapper .m-menu{
+.dark-mode .wrapper .m-menu {
   background: var(--gray-100);
 }
 
-.dark-mode .page-content .page-list ul{
+.dark-mode .page-content .page-list ul {
   background: var(--gray-80);
 }
 
@@ -1535,8 +1535,7 @@ body,
 .dark-mode .search label,
 .dark-mode .search .form-inner,
 .dark-mode .search .message-search,
-.dark-mode .search .help-search
-.dark-mode .search input {
+.dark-mode .search .help-search .dark-mode .search input {
   background: var(--gray-80);
   color: white;
 }

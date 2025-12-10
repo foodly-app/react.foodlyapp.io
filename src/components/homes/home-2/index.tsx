@@ -7,11 +7,14 @@ import HeaderOne from "../../../layouts/headers/HeaderOne";
 import { Link } from "react-router-dom";
 import ServiceModal from "../../../modals/ServiceModal";
 import ScrollTop from "../../common/ScrollTop";
-import { Restaurant, ApiResponse } from "../../../types/api";
+import { Restaurant, ApiResponse, Spot, SpotsApiResponse } from "../../../types/api";
+import { useTranslation } from "react-i18next";
 
 const Products = () => {
+	const { t, i18n } = useTranslation();
 	const [showModal, setShowModal] = useState(false);
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+	const [spots, setSpots] = useState<Spot[]>([]);
 
 	useEffect(() => {
 		fetch("https://api.foodly.pro/api/website/restaurants")
@@ -22,15 +25,29 @@ const Products = () => {
 				}
 			})
 			.catch((err) => console.error("Error fetching restaurants:", err));
+
+		// Fetch Spots
+		fetch("https://api.foodly.pro/api/website/spots")
+			.then((res) => res.json())
+			.then((data: SpotsApiResponse) => {
+				if (data.success) {
+					setSpots(data.data);
+				}
+			})
+			.catch((err) => console.error("Error fetching spots:", err));
 	}, []);
 
-	const getTranslation = (restaurant: Restaurant, field: 'name' | 'address') => {
-		const lang = 'ka'; // Default to Georgian as per user preference or context, or 'en'
-		// Let's try to find 'ka' first, then 'en', then first available
-		const t = restaurant.translations.find(t => t.locale === lang)
-			|| restaurant.translations.find(t => t.locale === 'en')
-			|| restaurant.translations[0];
-		return t ? t[field] : '';
+	const getTranslation = (item: Restaurant | Spot, field: 'name' | 'address') => {
+		const lang = i18n.language || 'ka'; // Use current language from i18n
+
+		const t = item.translations.find(t => t.locale === lang)
+			|| item.translations.find(t => t.locale === 'en')
+			|| item.translations[0];
+		// Address check
+		if (field === 'address' && 'address' in t) {
+			return t.address;
+		}
+		return t?.name || '';
 	}
 
 	return (
@@ -52,7 +69,7 @@ const Products = () => {
 							<input
 								type="search"
 								className="input-search input-field"
-								placeholder="Search..."
+								placeholder={t("Search...")}
 							/>
 							<div className="filter shrink-0">
 								<button
@@ -69,44 +86,21 @@ const Products = () => {
 				</section>
 
 				<section className="service py-12">
-					<Link to="/service-location">
-						<figure className="item text-center">
-							<div className="image rounded-full d-flex align-items-center justify-content-center m-auto">
-								<img
-									src="/assets/images/home/airport.png"
-									alt="airport"
-									className="img-fluid backface-hidden"
-								/>
-							</div>
-							<figcaption>Airport</figcaption>
-						</figure>
-					</Link>
-
-					<Link to="/service-location">
-						<figure className="item text-center">
-							<div className="image rounded-full d-flex align-items-center justify-content-center m-auto">
-								<img
-									src="/assets/images/home/car-rental.png"
-									alt="car"
-									className="img-fluid backface-hidden"
-								/>
-							</div>
-							<figcaption>Rental</figcaption>
-						</figure>
-					</Link>
-
-					<Link to="/service-location">
-						<figure className="item text-center">
-							<div className="image rounded-full d-flex align-items-center justify-content-center m-auto">
-								<img
-									src="/assets/images/home/hotel.png"
-									alt="hotel"
-									className="img-fluid backface-hidden"
-								/>
-							</div>
-							<figcaption>Hotel</figcaption>
-						</figure>
-					</Link>
+					{spots.map((spot) => (
+						<Link to={`/spot-details/${spot.slug}`} key={spot.id}>
+							<figure className="item text-center">
+								<div className="image rounded-full d-flex align-items-center justify-content-center m-auto">
+									<img
+										src={spot.image}
+										alt={getTranslation(spot, 'name')}
+										className="img-fluid backface-hidden"
+										style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+									/>
+								</div>
+								<figcaption>{getTranslation(spot, 'name')}</figcaption>
+							</figure>
+						</Link>
+					))}
 
 					<figure
 						className="item text-center"
@@ -123,13 +117,14 @@ const Products = () => {
 								className="img-fluid backface-hidden"
 							/>
 						</div>
-						<figcaption>More</figcaption>
+						<figcaption>{t("More")}</figcaption>
 					</figure>
+
 				</section>
 
 				<section className="visited py-12">
 					<div className="title d-flex align-items-center justify-content-between">
-						<h2 className="shrink-0">Frequently visited</h2>
+						<h2 className="shrink-0">{t("Restaurants")}</h2>
 						<div className="custom-pagination visited-pagination"></div>
 					</div>
 
@@ -179,9 +174,9 @@ const Products = () => {
 
 				<section className="guide py-12">
 					<div className="title d-flex align-items-center justify-content-between">
-						<h2 className="shrink-0">Tour Guide</h2>
+						<h2 className="shrink-0">{t("Tour Guide")}</h2>
 						<Link to="/tour-guide" className="shrink-0 d-inline-block">
-							See All
+							{t("See All")}
 						</Link>
 					</div>
 
@@ -242,9 +237,9 @@ const Products = () => {
 
 				<section className="budget pt-12">
 					<div className="title d-flex align-items-center justify-content-between">
-						<h2 className="shrink-0">On Budget Tour</h2>
+						<h2 className="shrink-0">{t("On Budget Tour")}</h2>
 						<Link to="/hotels" className="shrink-0 d-inline-block">
-							See All
+							{t("See All")}
 						</Link>
 					</div>
 

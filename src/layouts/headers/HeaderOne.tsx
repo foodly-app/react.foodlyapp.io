@@ -1,7 +1,8 @@
- 
+
 
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import LanguageSwitcher from "../../components/common/LanguageSwitcher";
 
 const HeaderOne = () => {
 
@@ -85,6 +86,7 @@ const HeaderOne = () => {
 					</button>
 
 					<div className="btn-grp d-flex align-items-center gap-16">
+						<LanguageSwitcher />
 						<label
 							htmlFor="mode-change"
 							className="mode-change d-flex align-items-center justify-content-center"
