@@ -5,14 +5,14 @@ import InfoArea from "./InfoArea";
 import { Swiper, SwiperSlide } from "swiper/react";
 import HeaderOne from "../../../layouts/headers/HeaderOne";
 import { Link } from "react-router-dom";
-import ServiceModal from "../../../modals/ServiceModal";
+
 import ScrollTop from "../../common/ScrollTop";
 import { Restaurant, ApiResponse, Spot, SpotsApiResponse } from "../../../types/api";
 import { useTranslation } from "react-i18next";
 
 const Products = () => {
 	const { t, i18n } = useTranslation();
-	const [showModal, setShowModal] = useState(false);
+
 	const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
 	const [spots, setSpots] = useState<Spot[]>([]);
 
@@ -102,23 +102,7 @@ const Products = () => {
 						</Link>
 					))}
 
-					<figure
-						className="item text-center"
-						data-bs-toggle="modal"
-						data-bs-target="#serviceModal"
-					>
-						<div
-							onClick={() => setShowModal(!showModal)}
-							className="image rounded-full d-flex align-items-center justify-content-center m-auto"
-						>
-							<img
-								src="/assets/images/home/category.png"
-								alt="category"
-								className="img-fluid backface-hidden"
-							/>
-						</div>
-						<figcaption>{t("More")}</figcaption>
-					</figure>
+
 
 				</section>
 
@@ -305,7 +289,7 @@ const Products = () => {
 				</section>
 			</main>
 
-			<ServiceModal setShowModal={setShowModal} showModal={showModal} />
+
 		</>
 	);
 };

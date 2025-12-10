@@ -86,7 +86,6 @@ const HeaderOne = () => {
 					</button>
 
 					<div className="btn-grp d-flex align-items-center gap-16">
-						<LanguageSwitcher />
 						<label
 							htmlFor="mode-change"
 							className="mode-change d-flex align-items-center justify-content-center"
@@ -103,6 +102,7 @@ const HeaderOne = () => {
 								className="moon"
 							/>
 						</label>
+						<LanguageSwitcher />
 						<Link to="/user-profile">
 							<img src="assets/svg/menu/profile-white.svg" alt="icon" />
 						</Link>

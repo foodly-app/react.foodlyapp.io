@@ -26,7 +26,7 @@ const resources = {
             "Hotel": "სასტუმრო",
             "More": "მეტი",
             "Tour Guide": "გიდი",
-            "See All": "ყველას ნახვა",
+            "See All": "ყველა",
             "On Budget Tour": "ბიუჯეტური ტურები",
             "Search...": "ძიება...",
             "Frequently visited": "ხშირად მონახულებული"
