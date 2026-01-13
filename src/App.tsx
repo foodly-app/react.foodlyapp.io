@@ -105,6 +105,7 @@ const router = createBrowserRouter([
 
 
 import { useFcm } from "./hooks/useFcm";
+import PermissionModal from "./modals/PermissionModal";
 
 import { NotificationProvider } from "./context/NotificationContext";
 
@@ -120,8 +121,14 @@ function App() {
 }
 
 function AppContent() {
-  useFcm();
-  return <RouterProvider router={router} />;
+  const { initializeFcm } = useFcm();
+
+  return (
+    <>
+      <PermissionModal onEnableNotifications={initializeFcm} />
+      <RouterProvider router={router} />
+    </>
+  );
 }
 
 export default App
