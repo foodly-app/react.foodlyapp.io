@@ -1,14 +1,50 @@
- 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { authService } from "../../../api/auth";
+import { useAuth } from "../../../context/AuthContext";
+import toast from "react-hot-toast";
 
 const SigninEmail = () => {
 	const navigate = useNavigate();
-  const handleBack = () => {
-    navigate(-1);  // -1 navigates back to the previous page
-  };
+	const location = useLocation();
+	const { login } = useAuth();
 
+	const [email, setEmail] = useState(location.state?.email || "");
+	const [password, setPassword] = useState("");
+	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
+
+	const handleBack = () => {
+		navigate(-1);
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (!email || !password) {
+			toast.error("Please fill in all fields");
+			return;
+		}
+
+		setLoading(true);
+		try {
+			const responseData = await authService.login({ email, password });
+
+			// According to real API structure: { token: "...", user: { id: ..., name: "...", ... } }
+			if (responseData && responseData.token) {
+				login(responseData.token, responseData.user);
+				toast.success("Logged in successfully!");
+				navigate("/");
+			} else {
+				toast.error("Login failed: Invalid response from server");
+			}
+		} catch (error: any) {
+			const errorMsg = error.response?.data?.message || "Invalid credentials";
+			toast.error(errorMsg);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<>
@@ -25,7 +61,7 @@ const SigninEmail = () => {
 						<h3 className="main-title">Sign In</h3>
 					</div>
 					<div className="auth-form">
-						<form onSubmit={(e) => e.preventDefault()}>
+						<form onSubmit={handleSubmit}>
 							<div className="d-flex flex-column gap-16">
 								<div>
 									<label htmlFor="lemail2">Email Address</label>
@@ -34,6 +70,9 @@ const SigninEmail = () => {
 										id="lemail2"
 										placeholder="Enter your email address"
 										className="input-field d-block"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										required
 									/>
 								</div>
 								<div>
@@ -42,28 +81,22 @@ const SigninEmail = () => {
 										<input
 											type={`${showPassword ? "text" : "password"}`}
 											id="lpass"
-											data-pssws-shown="false"
 											placeholder="Enter your password"
 											className="input-psswd input-field d-block"
+											value={password}
+											onChange={(e) => setPassword(e.target.value)}
+											required
 										/>
 										<button
 											onClick={() => setShowPassword(!showPassword)}
 											type="button"
 											className="eye-btn"
 										>
-											<span
-												className={`eye-off ${
-													showPassword ? "d-none" : "d-block"
-												}`}
-											>
+											<span className={`eye-off ${showPassword ? "d-none" : "d-block"}`}>
 												<img src="/assets/svg/eye-off.svg" alt="Eye Off" />
 											</span>
-											<span
-												className={`eye-on ${
-													showPassword ? "d-block" : "d-none"
-												}`}
-											>
-												<img src="/assets/svg/eye-on.svg" alt="Eye Off" />
+											<span className={`eye-on ${showPassword ? "d-block" : "d-none"}`}>
+												<img src="/assets/svg/eye-on.svg" alt="Eye On" />
 											</span>
 										</button>
 									</div>
@@ -87,9 +120,9 @@ const SigninEmail = () => {
 									</Link>
 								</div>
 							</div>
-							<Link to="/otp" className="btn-primary">
-								Sign In
-							</Link>
+							<button type="submit" className="btn-primary mt-24" disabled={loading}>
+								{loading ? "Signing In..." : "Sign In"}
+							</button>
 						</form>
 
 						<div className="divider d-flex align-items-center justify-content-center gap-12">
@@ -99,21 +132,11 @@ const SigninEmail = () => {
 						</div>
 
 						<div className="d-flex flex-column gap-16">
-							<button
-								type="button"
-								className="social-btn"
-								data-bs-toggle="modal"
-								data-bs-target="#loginSuccess"
-							>
+							<button type="button" className="social-btn">
 								<img src="/assets/svg/icon-google.svg" alt="Google" />
 								Continue with Google
 							</button>
-							<button
-								type="button"
-								className="social-btn apple"
-								data-bs-toggle="modal"
-								data-bs-target="#loginSuccess"
-							>
+							<button type="button" className="social-btn apple">
 								<img src="/assets/svg/icon-apple.svg" alt="Apple" />
 								Continue with Apple
 							</button>
@@ -125,31 +148,9 @@ const SigninEmail = () => {
 					</div>
 				</section>
 			</main>
-
-			<div
-				className="modal fade loginSuccessModal modalBg"
-				id="loginSuccess"
-				tabIndex={-1}
-				aria-hidden="true"
-			>
-				<div className="modal-dialog modal-dialog-centered">
-					<div className="modal-content">
-						<div className="modal-body text-center">
-							<img src="/assets/svg/check-green.svg" alt="Check" />
-							<h3>You have logged in successfully</h3>
-							<p className="mb-32">
-								Lorem Ipsum is simply dummy text of the printing and typesetting
-								industry.
-							</p>
-							<Link to="/home" className="btn-primary">
-								Continue
-							</Link>
-						</div>
-					</div>
-				</div>
-			</div>
 		</>
 	);
 };
 
 export default SigninEmail;
+

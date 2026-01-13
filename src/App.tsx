@@ -1,11 +1,11 @@
- 
 
- import { createBrowserRouter, RouterProvider } from "react-router-dom"; 
- import Otp from "./components/auth/otp";
- import AllPages from "./components/all-pages";
- import Signup from "./components/auth/signup";
- import Signin from "./components/auth/signin";
- import MainHome from "./components/homes/home";
+
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Otp from "./components/auth/otp";
+import AllPages from "./components/all-pages";
+import Signup from "./components/auth/signup";
+import Signin from "./components/auth/signin";
+import MainHome from "./components/homes/home";
 import Products from "./components/homes/home-2";
 import SignupEmail from "./components/auth/signup-email";
 import SigninEmail from "./components/auth/signin-email";
@@ -47,67 +47,81 @@ import HelpSupport from "./components/profile/help-support";
 import SplashScreen from "./components/splash-screen";
 import Support from "./components/profile/support";
 import Language from "./components/profile/language";
- 
- const router = createBrowserRouter([
-   { path: "/", element: <MainHome /> }, 
-   { path: "/user-profile", element: <UserProfile /> }, 
-   { path: "/home", element: <Products /> }, 
-   { path: "/all-pages", element: <AllPages /> }, 
-   { path: "/signup", element: <Signup /> }, 
-   { path: "/signup-email", element: <SignupEmail /> }, 
-   { path: "/signin", element: <Signin /> }, 
-   { path: "/signin-email", element: <SigninEmail /> }, 
-   { path: "/create-new-password", element: <CreateNewPassword /> }, 
-   { path: "/forgot-password", element: <ForgotPassword /> }, 
-   { path: "/otp", element: <Otp /> }, 
-   { path: "/select-language", element: <SelectLanguage /> }, 
-   { path: "/chat", element: <ChatArea /> }, 
-   { path: "/message", element: <Message /> }, 
-   { path: "/audio-call", element: <AudioCall /> }, 
-   { path: "/video-call", element: <VideoCall /> }, 
-   { path: "/user-info", element: <UserInfo /> }, 
-   { path: "/guide-profile", element: <GuideProfile /> }, 
-   { path: "/user-address", element: <UserAddress /> }, 
-   { path: "/add-address", element: <AddAddress /> }, 
-   { path: "/add-card", element: <AddCard /> }, 
-   { path: "/change-password", element: <ChangePassword /> }, 
-   { path: "/notifications", element: <Notifications /> }, 
-   { path: "/security", element: <Security /> }, 
-   { path: "/user-language", element: <UserLanguage /> }, 
-   { path: "/user-payment", element: <UserPayment /> }, 
-   { path: "/book-hotel", element: <BookHotel /> }, 
-   { path: "/checkout-hotel", element: <CheckoutHotel /> }, 
-   { path: "/hotels", element: <Hotels /> }, 
-   { path: "/hotel-details", element: <HotelDetails /> }, 
-   { path: "/vacation-details", element: <VacationDetails /> }, 
-   { path: "/wishlist", element: <Wishlist /> }, 
-   { path: "/explore", element: <Explore /> }, 
-   { path: "/checkout-vacation", element: <CheckoutVacation /> }, 
-   { path: "/search-result", element: <SearchResult /> }, 
-   { path: "/service-location", element: <ServiceLocation /> }, 
-   { path: "/ticket-booked", element: <TicketBooked /> }, 
-   { path: "/ticket-detail", element: <TicketDetail /> }, 
-   { path: "/tour-guide", element: <TourGuide /> }, 
-   { path: "/notification", element: <Notification /> }, 
-   { path: "/review", element: <Review /> }, 
-   { path: "/policy", element: <Policy /> }, 
-   { path: "/help-support", element: <HelpSupport /> }, 
-   { path: "/splash-screen", element: <SplashScreen /> }, 
-   { path: "/support", element: <Support /> }, 
-   { path: "/language", element: <Language /> }, 
+import { AuthProvider } from "./context/AuthContext";
+import { Toaster } from "react-hot-toast";
+
+
+const router = createBrowserRouter([
+  { path: "/", element: <MainHome /> },
+  { path: "/user-profile", element: <UserProfile /> },
+  { path: "/home", element: <Products /> },
+  { path: "/all-pages", element: <AllPages /> },
+  { path: "/signup", element: <Signup /> },
+  { path: "/signup-email", element: <SignupEmail /> },
+  { path: "/signin", element: <Signin /> },
+  { path: "/signin-email", element: <SigninEmail /> },
+  { path: "/create-new-password", element: <CreateNewPassword /> },
+  { path: "/forgot-password", element: <ForgotPassword /> },
+  { path: "/otp", element: <Otp /> },
+  { path: "/select-language", element: <SelectLanguage /> },
+  { path: "/chat", element: <ChatArea /> },
+  { path: "/message", element: <Message /> },
+  { path: "/audio-call", element: <AudioCall /> },
+  { path: "/video-call", element: <VideoCall /> },
+  { path: "/user-info", element: <UserInfo /> },
+  { path: "/guide-profile", element: <GuideProfile /> },
+  { path: "/user-address", element: <UserAddress /> },
+  { path: "/add-address", element: <AddAddress /> },
+  { path: "/add-card", element: <AddCard /> },
+  { path: "/change-password", element: <ChangePassword /> },
+  { path: "/notifications", element: <Notifications /> },
+  { path: "/security", element: <Security /> },
+  { path: "/user-language", element: <UserLanguage /> },
+  { path: "/user-payment", element: <UserPayment /> },
+  { path: "/book-hotel", element: <BookHotel /> },
+  { path: "/checkout-hotel", element: <CheckoutHotel /> },
+  { path: "/hotels", element: <Hotels /> },
+  { path: "/hotel-details", element: <HotelDetails /> },
+  { path: "/vacation-details", element: <VacationDetails /> },
+  { path: "/wishlist", element: <Wishlist /> },
+  { path: "/explore", element: <Explore /> },
+  { path: "/checkout-vacation", element: <CheckoutVacation /> },
+  { path: "/search-result", element: <SearchResult /> },
+  { path: "/service-location", element: <ServiceLocation /> },
+  { path: "/ticket-booked", element: <TicketBooked /> },
+  { path: "/ticket-detail", element: <TicketDetail /> },
+  { path: "/tour-guide", element: <TourGuide /> },
+  { path: "/notification", element: <Notification /> },
+  { path: "/review", element: <Review /> },
+  { path: "/policy", element: <Policy /> },
+  { path: "/help-support", element: <HelpSupport /> },
+  { path: "/splash-screen", element: <SplashScreen /> },
+  { path: "/support", element: <Support /> },
+  { path: "/language", element: <Language /> },
 
   //  { path: "*", element: <NotFound />, errorElement: <CustomError /> },
- ]);
+]);
 
- 
 
-function App() { 
 
+import { useFcm } from "./hooks/useFcm";
+
+import { NotificationProvider } from "./context/NotificationContext";
+
+function App() {
   return (
-    <> 
-        <RouterProvider router={router} /> 
-    </>
+    <AuthProvider>
+      <NotificationProvider>
+        <Toaster position="top-right" />
+        <AppContent />
+      </NotificationProvider>
+    </AuthProvider>
   )
+}
+
+function AppContent() {
+  useFcm();
+  return <RouterProvider router={router} />;
 }
 
 export default App

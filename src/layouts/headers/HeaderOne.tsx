@@ -1,10 +1,15 @@
 
 
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LanguageSwitcher from "../../components/common/LanguageSwitcher";
+import { useAuth } from "../../context/AuthContext";
+import { authService } from "../../api/auth";
+import toast from "react-hot-toast";
 
 const HeaderOne = () => {
+	const { user, isAuthenticated, logout } = useAuth();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const chk: HTMLInputElement | null = document.getElementById(
@@ -26,13 +31,12 @@ const HeaderOne = () => {
 			const darkModeStatus = target.checked;
 			toggleDarkMode(darkModeStatus);
 			localStorage.setItem("darkModeStatus", darkModeStatus.toString());
-			modeChk.checked = darkModeStatus;
-			enableMode.checked = darkModeStatus;
+			if (modeChk) modeChk.checked = darkModeStatus;
+			if (enableMode) enableMode.checked = darkModeStatus;
 		};
 
 		if (chk) {
 			chk.addEventListener("change", changeHandler);
-
 			const storedDarkModeStatus = localStorage.getItem("darkModeStatus");
 			if (storedDarkModeStatus === "true") {
 				toggleDarkMode(true);
@@ -42,7 +46,6 @@ const HeaderOne = () => {
 
 		if (modeChk) {
 			modeChk.addEventListener("change", changeHandler);
-
 			const storedDarkModeStatus = localStorage.getItem("darkModeStatus");
 			if (storedDarkModeStatus === "true") {
 				toggleDarkMode(true);
@@ -52,7 +55,6 @@ const HeaderOne = () => {
 
 		if (enableMode) {
 			enableMode.addEventListener("change", changeHandler);
-
 			const storedDarkModeStatus = localStorage.getItem("darkModeStatus");
 			if (storedDarkModeStatus === "true") {
 				toggleDarkMode(true);
@@ -60,7 +62,6 @@ const HeaderOne = () => {
 			}
 		}
 
-		// Clean-up
 		return () => {
 			if (chk) chk.removeEventListener("change", changeHandler);
 			if (modeChk) modeChk.removeEventListener("change", changeHandler);
@@ -73,10 +74,22 @@ const HeaderOne = () => {
 		setShow(!show);
 	};
 
+	const handleLogout = async () => {
+		try {
+			await authService.logout();
+			logout();
+			toast.success("Logged out successfully");
+			navigate("/signin");
+		} catch (error) {
+			logout(); // Logout locally anyway
+			navigate("/signin");
+		}
+	};
+
 	return (
 		<>
 			<section className="wrapper dz-mode">
-				<div className="menu">
+				<div className="menu d-flex align-items-center justify-content-between">
 					<button onClick={toggleShow} className="toggle-btn">
 						<img
 							src="assets/svg/menu/burger-white.svg"
@@ -85,8 +98,12 @@ const HeaderOne = () => {
 						/>
 					</button>
 
+					<Link to="/" className="main-logo">
+						<img src="/assets/images/logo.png" alt="logo" style={{ height: '28px', objectFit: 'contain' }} />
+					</Link>
+
 					<div className="btn-grp d-flex align-items-center gap-16">
-						<label
+						{/* <label
 							htmlFor="mode-change"
 							className="mode-change d-flex align-items-center justify-content-center"
 						>
@@ -101,11 +118,8 @@ const HeaderOne = () => {
 								alt="icon"
 								className="moon"
 							/>
-						</label>
+						</label> */}
 						<LanguageSwitcher />
-						<Link to="/user-profile">
-							<img src="assets/svg/menu/profile-white.svg" alt="icon" />
-						</Link>
 					</div>
 				</div>
 				<div
@@ -119,10 +133,10 @@ const HeaderOne = () => {
 							<img src="assets/svg/menu/close-white.svg" alt="icon" />
 						</button>
 						<div className="menu-user">
-							<img src="assets/images/profile/avatar.png" alt="avatar" />
+							<img src={user?.avatar || "assets/images/profile/avatar.png"} alt="avatar" />
 							<div>
-								<a href="#!">angela mayer</a>
-								<h3>Verified user · Membership</h3>
+								<a href="#!">{user ? `${user.name} ${user.surname}` : "Guest User"}</a>
+								<h3>{user ? "Verified user" : "Sign in to access more features"}</h3>
 							</div>
 						</div>
 					</div>
@@ -132,7 +146,7 @@ const HeaderOne = () => {
 						</li>
 
 						<li>
-							<Link to="/home" onClick={toggleShow}>
+							<Link to="/" onClick={toggleShow}>
 								<div className="d-flex align-items-center gap-16">
 									<span className="icon">
 										<img src="assets/svg/menu/pie-white.svg" alt="image-here" />
@@ -145,180 +159,63 @@ const HeaderOne = () => {
 								/>
 							</Link>
 						</li>
+
+						{isAuthenticated ? (
+							<li>
+								<button
+									onClick={handleLogout}
+									className="d-flex align-items-center justify-content-between w-100 bg-transparent border-0 p-0 text-white"
+									style={{ textTransform: 'lowercase' }}
+								>
+									<div className="d-flex align-items-center gap-16">
+										<span className="icon">
+											<img src="assets/svg/menu/logout-white.svg" alt="icon" style={{ filter: 'brightness(0) invert(1)' }} />
+										</span>
+										logout
+									</div>
+									<img
+										src="assets/svg/menu/chevron-right-black.svg"
+										alt="icon"
+									/>
+								</button>
+							</li>
+						) : (
+							<li>
+								<Link to="/signin" onClick={toggleShow}>
+									<div className="d-flex align-items-center gap-16">
+										<span className="icon">
+											<img src="assets/svg/menu/profile-white.svg" alt="icon" />
+										</span>
+										login
+									</div>
+									<img
+										src="assets/svg/menu/chevron-right-black.svg"
+										alt="icon"
+									/>
+								</Link>
+							</li>
+						)}
+
 						<li>
-							<Link to="/all-pages">
-								<div className="d-flex align-items-center gap-16">
-									<span className="icon">
-										<img
-											src="assets/svg/menu/page-white.svg"
-											alt="image-here"
-										/>
-									</span>
-									pages
-								</div>
-								<img
-									src="assets/svg/menu/chevron-right-black.svg"
-									alt="image-here"
-								/>
-							</Link>
-						</li>
-						<li>
-							<h2 className="menu-title">others</h2>
+							<h2 className="menu-title">settings</h2>
 						</li>
 
 						<li>
-							<label className="a-label__chevron" htmlFor="item-4">
-								<span className="d-flex align-items-center gap-16">
+							<Link to="/user-info" onClick={toggleShow}>
+								<div className="d-flex align-items-center gap-16">
 									<span className="icon">
-										<img
-											src="assets/svg/menu/grid-white.svg"
-											alt="image-here"
-										/>
+										<img src="assets/svg/menu/gear-white.svg" alt="icon" />
 									</span>
-									components
-								</span>
+									profile settings
+								</div>
 								<img
 									src="assets/svg/menu/chevron-right-black.svg"
-									alt="image-here"
+									alt="icon"
 								/>
-							</label>
-							<input
-								type="checkbox"
-								id="item-4"
-								name="item-4"
-								className="m-menu__checkbox"
-							/>
-							<div className="m-menu">
-								<div className="m-menu__header">
-									<label className="m-menu__toggle" htmlFor="item-4">
-										<img
-											src="assets/svg/menu/back-white.svg"
-											alt="image-here"
-										/>
-									</label>
-									<span className="m-menu__header-title">components</span>
-								</div>
-								<ul>
-									<li>
-										<Link to="/splash-screen">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												splash screen
-											</div>
-										</Link>
-									</li>
-								</ul>
-							</div>
+							</Link>
 						</li>
-						<li>
-							<label className="a-label__chevron" htmlFor="item-5">
-								<span className="d-flex align-items-center gap-16">
-									<span className="icon">
-										<img
-											src="assets/svg/menu/gear-white.svg"
-											alt="image-here"
-										/>
-									</span>
-									settings
-								</span>
-								<img
-									src="assets/svg/menu/chevron-right-black.svg"
-									alt="image-here"
-								/>
-							</label>
-							<input
-								type="checkbox"
-								id="item-5"
-								name="item-5"
-								className="m-menu__checkbox"
-							/>
-							<div className="m-menu">
-								<div className="m-menu__header">
-									<label className="m-menu__toggle" htmlFor="item-5">
-										<img
-											src="assets/svg/menu/back-white.svg"
-											alt="image-here"
-										/>
-									</label>
-									<span className="m-menu__header-title">settings</span>
-								</div>
-								<ul>
-									<li>
-										<Link to="/user-address">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												My Address
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/user-payment">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Payment Method
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/change-password">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Change Password
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/forgot-password">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Forgot Password
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/security">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Security
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/user-language">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Language
-											</div>
-										</Link>
-									</li>
-									<li>
-										<Link to="/notifications">
-											<div className="d-flex align-items-center gap-16">
-												<span className="icon">
-													<img src="assets/svg/menu/box-white.svg" alt="icon" />
-												</span>
-												Notifications
-											</div>
-										</Link>
-									</li>
-								</ul>
-							</div>
-						</li>
-						<li className="dz-switch">
+
+						{/* <li className="dz-switch">
 							<div className="a-label__chevron">
 								<div className="d-flex align-items-center gap-16">
 									<span className="icon">
@@ -338,12 +235,13 @@ const HeaderOne = () => {
 									<span className="slider"></span>
 								</label>
 							</div>
-						</li>
+						</li> */}
 					</ul>
 				</div>
-			</section>
+			</section >
 		</>
 	);
 };
 
 export default HeaderOne;
+

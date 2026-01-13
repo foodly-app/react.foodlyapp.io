@@ -1,11 +1,9 @@
- 
- 
- // @ts-ignore
+
+
+// @ts-ignore
 import('bootstrap/dist/js/bootstrap.bundle.min.js');
 
-const LogOutModal = ({ handleLogout, showModal }: any) => {
-
- 
+const LogOutModal = ({ handleLogout, toggleModal, showModal }: any) => {
 	return (
 		<>
 			<div
@@ -20,7 +18,7 @@ const LogOutModal = ({ handleLogout, showModal }: any) => {
 						<div className="modal-header justify-content-end">
 							<button
 								type="button"
-								onClick={handleLogout}
+								onClick={toggleModal}
 								className="close-btn d-flex align-items-center justify-content-center rounded-full"
 								data-bs-dismiss="modal"
 								aria-label="Close"
@@ -36,7 +34,7 @@ const LogOutModal = ({ handleLogout, showModal }: any) => {
 										type="button"
 										data-bs-dismiss="modal"
 										aria-label="Close"
-										onClick={handleLogout}
+										onClick={toggleModal}
 									>
 										Cancel
 									</button>

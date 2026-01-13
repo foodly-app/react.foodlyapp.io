@@ -1,18 +1,7 @@
-
-import HeaderOne from "../../../layouts/headers/HeaderOne";
-import ScrollTop from "../../common/ScrollTop";
-import Onboarding from "./Onboarding";
+import Products from "../home-2";
 
 const MainHome = () => {
-	return (
-		<>
-			<HeaderOne />
-			<main>
-				<Onboarding />
-			</main>
-			<ScrollTop />
-		</>
-	);
+	return <Products />;
 };
 
 export default MainHome;

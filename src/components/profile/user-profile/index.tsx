@@ -1,11 +1,16 @@
- 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../../layouts/footers/Footer";
 import LogOutModal from "../../../modals/LogOutModal";
 import ScrollTop from "../../common/ScrollTop";
+import { useAuth } from "../../../context/AuthContext";
+import { authService } from "../../../api/auth";
+import toast from "react-hot-toast";
 
 const UserProfile = () => {
+	const { user, logout } = useAuth();
+	const navigate = useNavigate();
+
 	useEffect(() => {
 		const chk: HTMLInputElement | null = document.getElementById(
 			"check-mode"
@@ -54,28 +59,40 @@ const UserProfile = () => {
 	}, []);
 
 	const [showModal, setShowModal] = useState(false);
-	const handleLogout = () => {
+	const toggleModal = () => {
 		setShowModal(!showModal);
+	};
+
+	const confirmLogout = async () => {
+		try {
+			await authService.logout();
+			logout();
+			toast.success("Logged out successfully");
+			navigate("/signin");
+		} catch (error) {
+			logout(); // Force logout locally
+			navigate("/signin");
+		}
 	};
 
 	return (
 		<>
-		<ScrollTop />
+			<ScrollTop />
 			<main className="user-profile">
 				<section className="user-profile-heading d-flex align-items-center justify-content-between">
 					<div className="d-flex align-items-center gap-12">
 						<div className="image rounded-full overflow-hidden shrink-0">
 							<img
-								src="/assets/images/profile/avatar.png"
+								src={user?.avatar || "/assets/images/profile/avatar.png"}
 								alt="avatar"
 								className="img-fluid w-100 h-100 object-fit-cover"
 							/>
 						</div>
 						<div>
-							<h3>Andy Lexsian</h3>
+							<h3>{user ? `${user.name} ${user.surname}` : "Andy Lexsian"}</h3>
 							<p className="d-flex align-items-center gap-04 location mt-04">
 								<img src="/assets/svg/map-marker.svg" alt="icon" />
-								Uttar Pradesh, India
+								{user?.country_code || "Georgia"}
 							</p>
 						</div>
 					</div>
@@ -261,7 +278,7 @@ const UserProfile = () => {
 				<div className="py-32">
 					<button
 						type="button"
-						onClick={handleLogout}
+						onClick={toggleModal}
 						className="btn-primary-outline"
 						data-bs-toggle="modal"
 						data-bs-target="#logOutModal"
@@ -273,7 +290,7 @@ const UserProfile = () => {
 
 			<Footer />
 
-			<LogOutModal handleLogout={handleLogout} showModal={showModal} />
+			<LogOutModal handleLogout={confirmLogout} toggleModal={toggleModal} showModal={showModal} />
 		</>
 	);
 };

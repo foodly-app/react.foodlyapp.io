@@ -1,13 +1,13 @@
- 
+
 import { useState } from "react";
 import HeaderOne from "../../../layouts/headers/HeaderOne";
 import { Link } from "react-router-dom";
 
- 
+
 
 const Signin = () => {
 	const [loginModal, setLoginModal] = useState(false);
- 
+	const [email, setEmail] = useState("");
 
 	return (
 		<>
@@ -28,9 +28,11 @@ const Signin = () => {
 									id="lemail1"
 									placeholder="Enter your email address"
 									className="input-field"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
 								/>
 							</div>
-							<Link to="/signin-email" className="btn-primary">
+							<Link to="/signin-email" state={{ email }} className="btn-primary">
 								Continue with Email
 							</Link>
 						</form>
@@ -72,9 +74,8 @@ const Signin = () => {
 			</main>
 
 			<div
-				className={`modal fade loginSuccessModal modalBg ${
-					loginModal ? "show" : ""
-				}`}
+				className={`modal fade loginSuccessModal modalBg ${loginModal ? "show" : ""
+					}`}
 				id="loginSuccess"
 				tabIndex={-1}
 				aria-hidden="true"

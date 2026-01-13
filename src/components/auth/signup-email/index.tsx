@@ -1,16 +1,57 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { authService } from "../../../api/auth";
+import toast from "react-hot-toast";
 
 const SignupEmail = () => {
- 
 	const navigate = useNavigate();
-  const handleBack = () => {
-    navigate(-1);  // -1 navigates back to the previous page
-  };
-
-
-	const [showPassword, setShowPassword] =  useState(false);
+	const location = useLocation();
+	const [email] = useState(location.state?.email || "");
+	const [firstName, setFirstName] = useState("");
+	const [lastName, setLastName] = useState("");
+	const [password, setPassword] = useState("");
+	const [passwordConfirmation, setPasswordConfirmation] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 	const [showPassword2, setShowPassword2] = useState(false);
+
+	useEffect(() => {
+		if (!email) {
+			navigate("/signup");
+		}
+	}, [email, navigate]);
+
+	const handleBack = () => {
+		navigate(-1);
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		if (password !== passwordConfirmation) {
+			toast.error("Passwords do not match");
+			return;
+		}
+
+		setLoading(true);
+		try {
+			await authService.register({
+				first_name: firstName,
+				last_name: lastName,
+				email,
+				password,
+				password_confirmation: passwordConfirmation,
+			});
+
+			toast.success("Registration successful! Please verify your email.");
+			navigate("/otp", { state: { email } });
+		} catch (error: any) {
+			const errorMsg = error.response?.data?.message || "Registration failed";
+			toast.error(errorMsg);
+		} finally {
+			setLoading(false);
+		}
+	};
 
 	return (
 		<>
@@ -28,29 +69,37 @@ const SignupEmail = () => {
 					</div>
 
 					<div className="heading">
-						<h2>Complet your account</h2>
-						<p>Lorem ipsum dolor sit amet</p>
+						<h2>Complete your account</h2>
+						<p>Fill in the details to create your account</p>
 					</div>
 					<div className="auth-form">
-						<form onSubmit={(e) => e.preventDefault()}>
+						<form onSubmit={handleSubmit}>
 							<div className="d-flex flex-column gap-16">
-								<div>
-									<label htmlFor="fname">First Name</label>
-									<input
-										type="text"
-										id="fname"
-										placeholder="Enter your first name"
-										className="input-field d-block"
-									/>
-								</div>
-								<div>
-									<label htmlFor="lname">Last Name</label>
-									<input
-										type="text"
-										id="lname"
-										placeholder="Enter your last name"
-										className="input-field d-block"
-									/>
+								<div className="row">
+									<div className="col-6">
+										<label htmlFor="fname">First Name</label>
+										<input
+											type="text"
+											id="fname"
+											placeholder="First name"
+											className="input-field d-block"
+											value={firstName}
+											onChange={(e) => setFirstName(e.target.value)}
+											required
+										/>
+									</div>
+									<div className="col-6">
+										<label htmlFor="lname">Last Name</label>
+										<input
+											type="text"
+											id="lname"
+											placeholder="Last name"
+											className="input-field d-block"
+											value={lastName}
+											onChange={(e) => setLastName(e.target.value)}
+											required
+										/>
+									</div>
 								</div>
 								<div>
 									<label htmlFor="remail2">Email Address</label>
@@ -59,6 +108,8 @@ const SignupEmail = () => {
 										id="remail2"
 										placeholder="Enter your email address"
 										className="input-field d-block"
+										value={email}
+										readOnly
 									/>
 								</div>
 								<div>
@@ -67,24 +118,22 @@ const SignupEmail = () => {
 										<input
 											type={`${showPassword ? "text" : "password"}`}
 											id="rpass"
-											data-pssws-shown="false"
 											placeholder="Enter your password"
 											className="input-psswd input-field d-block"
+											value={password}
+											onChange={(e) => setPassword(e.target.value)}
+											required
 										/>
 										<button
 											type="button"
 											className="eye-btn"
 											onClick={() => setShowPassword(!showPassword)}
 										>
-											<span
-												className={`eye-off ${showPassword ? "d-none" : ""}`}
-											>
+											<span className={`eye-off ${showPassword ? "d-none" : ""}`}>
 												<img src="/assets/svg/eye-off.svg" alt="Eye Off" />
 											</span>
-											<span
-												className={`eye-on ${showPassword ? "" : "d-none"}`}
-											>
-												<img src="/assets/svg/eye-on.svg" alt="Eye Off" />
+											<span className={`eye-on ${showPassword ? "" : "d-none"}`}>
+												<img src="/assets/svg/eye-on.svg" alt="Eye On" />
 											</span>
 										</button>
 									</div>
@@ -95,32 +144,30 @@ const SignupEmail = () => {
 										<input
 											type={`${showPassword2 ? "text" : "password"}`}
 											id="rcpass"
-											data-pssws-shown="false"
 											placeholder="Confirm your password"
 											className="input-psswd input-field d-block"
+											value={passwordConfirmation}
+											onChange={(e) => setPasswordConfirmation(e.target.value)}
+											required
 										/>
 										<button
 											type="button"
 											className="eye-btn"
 											onClick={() => setShowPassword2(!showPassword2)}
 										>
-											<span
-												className={`eye-off ${showPassword2 ? "d-none" : ""}`}
-											>
+											<span className={`eye-off ${showPassword2 ? "d-none" : ""}`}>
 												<img src="/assets/svg/eye-off.svg" alt="Eye Off" />
 											</span>
-											<span
-												className={`eye-on ${showPassword2 ? "" : "d-none"}`}
-											>
-												<img src="/assets/svg/eye-on.svg" alt="Eye Off" />
+											<span className={`eye-on ${showPassword2 ? "" : "d-none"}`}>
+												<img src="/assets/svg/eye-on.svg" alt="Eye On" />
 											</span>
 										</button>
 									</div>
 								</div>
 							</div>
-							<Link to="/otp" className="btn-primary">
-								Sign Up
-							</Link>
+							<button type="submit" className="btn-primary mt-24" disabled={loading}>
+								{loading ? "Signing Up..." : "Sign Up"}
+							</button>
 						</form>
 
 						<h6>
@@ -134,3 +181,4 @@ const SignupEmail = () => {
 };
 
 export default SignupEmail;
+
