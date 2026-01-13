@@ -65,7 +65,9 @@ export const authService = {
     },
 
     getNotificationSettings: async () => {
-        const response = await apiClient.get('/website/settings/notifications');
+        const response = await apiClient.get('/website/settings/notifications', {
+            params: { platform: 'react-web' }
+        });
         return response.data; // { vapid_public_key, firebase_config, notification_icon }
     },
 

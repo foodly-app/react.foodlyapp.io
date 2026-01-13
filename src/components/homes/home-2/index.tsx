@@ -157,69 +157,6 @@ const Products = () => {
 					</Swiper>
 				</section>
 
-				<section className="guide py-12">
-					<div className="title d-flex align-items-center justify-content-between">
-						<h2 className="shrink-0">{t("Tour Guide")}</h2>
-						<Link to="/tour-guide" className="shrink-0 d-inline-block">
-							{t("See All")}
-						</Link>
-					</div>
-
-					<div className="d-flex gap-24 all-cards scrollbar-hidden">
-						<Link
-							to="/guide-profile"
-							className="d-flex gap-16 item w-fit shrink-0"
-						>
-							<div className="image position-relative shrink-0">
-								<img
-									src="/assets/images/home/guide-1.png"
-									alt="guide"
-									className="guide-img object-fit-cover img-fluid radius-12"
-								/>
-								<div className="rating d-flex align-items-center gap-04 w-fit">
-									<img src="/assets/svg/star-yellow.svg" alt="Star" />
-									<span className="d-inline-block">4.0</span>
-								</div>
-							</div>
-
-							<div className="content">
-								<h4>Emilia Ricardo</h4>
-								<h5>$25 (1 Day)</h5>
-								<p className="d-flex align-items-center gap-8 location">
-									<img src="/assets/svg/map-black.svg" alt="icon" />
-									Polynesia, French
-								</p>
-							</div>
-						</Link>
-
-						<Link
-							to="/guide-profile"
-							className="d-flex gap-16 item w-fit shrink-0"
-						>
-							<div className="image position-relative shrink-0">
-								<img
-									src="/assets/images/home/guide-2.png"
-									alt="guide"
-									className="guide-img object-fit-cover img-fluid radius-12"
-								/>
-								<div className="rating d-flex align-items-center gap-04 w-fit">
-									<img src="/assets/svg/star-yellow.svg" alt="Star" />
-									<span className="d-inline-block">4.0</span>
-								</div>
-							</div>
-
-							<div className="content">
-								<h4>Jonsky Alexia</h4>
-								<h5>$30 (1 Day)</h5>
-								<p className="d-flex align-items-center gap-8 location">
-									<img src="/assets/svg/map-black.svg" alt="icon" />
-									South America
-								</p>
-							</div>
-						</Link>
-					</div>
-				</section>
-
 				<section className="budget pt-12">
 					<div className="title d-flex align-items-center justify-content-between">
 						<h2 className="shrink-0">{t("On Budget Tour")}</h2>

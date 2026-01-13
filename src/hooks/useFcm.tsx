@@ -15,32 +15,28 @@ export const useFcm = () => {
         try {
             console.log('Initializing FCM...');
 
-            // 1. Fetch VAPID key from API (even if we hardcode config)
+            // 1. Fetch Firebase configuration from API with platform parameter
             const response = await authService.getNotificationSettings();
             const configData = response.data || response;
-            const vapid_public_key = configData.vapid_public_key;
 
-            // 2. Verified config from screenshot
-            const firebase_config = {
-                apiKey: "AIzaSyAyUbGaUvo2DzhC2WDLGNr5FliKw1r0wwg",
-                authDomain: "foodly-api-899d1.firebaseapp.com",
-                projectId: "foodly-api-899d1",
-                storageBucket: "foodly-api-899d1.firebasestorage.app",
-                messagingSenderId: "290878469832",
-                appId: "1:290878469832:web:3e58a59d44586921dc97fd",
-                measurementId: "G-0797R63VYD"
-            };
+            if (!configData.firebase_config || !configData.vapid_public_key) {
+                console.error('Missing firebase_config or vapid_public_key from API');
+                return;
+            }
 
-            // Initialize app (one instance)
+            const { firebase_config, vapid_public_key } = configData;
+            console.log('Firebase config loaded from API');
+
+            // 2. Initialize Firebase with config from API
             const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebase_config);
             const messaging = getMessaging(app);
 
-            // 3. Register Service Worker (proxied)
+            // 3. Register Service Worker with platform parameter
             let swRegistration: ServiceWorkerRegistration | undefined;
             if ('serviceWorker' in navigator) {
                 try {
-                    swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-                    console.log('FCM Service Worker registered:', swRegistration.scope);
+                    swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js?platform=react-web');
+                    console.log('FCM Service Worker registered with scope:', swRegistration.scope);
                 } catch (swError) {
                     console.error('FCM Service Worker registration failed:', swError);
                 }
@@ -56,6 +52,7 @@ export const useFcm = () => {
                     });
 
                     if (currentToken) {
+                        // Send token to backend
                         await authService.saveFcmToken({
                             token: currentToken,
                             platform: 'web',
@@ -70,7 +67,7 @@ export const useFcm = () => {
                 }
             }
 
-            // 6. Handle Foreground Messages
+            // 5. Handle Foreground Messages
             onMessage(messaging, (payload) => {
                 console.log('Message received in foreground: ', payload);
                 const { title, body } = payload.notification || {};
@@ -102,11 +99,28 @@ export const useFcm = () => {
         }
     };
 
+    const requestPermission = async () => {
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                console.log('Notification permission granted');
+                await initializeFcm();
+                return true;
+            } else {
+                console.log('Notification permission denied');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error requesting notification permission:', error);
+            return false;
+        }
+    };
+
     useEffect(() => {
         if (isAuthenticated) {
             initializeFcm();
         }
     }, [isAuthenticated]);
 
-    return { initializeFcm };
+    return { initializeFcm, requestPermission };
 };

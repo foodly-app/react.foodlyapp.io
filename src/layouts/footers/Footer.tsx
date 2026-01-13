@@ -25,9 +25,9 @@ const Footer = () => {
 						</Link>
 					</li>
 					<li>
-						<Link to="/ticket-booked">
+						<Link to="/reservations">
 							<img
-								src={path === "/ticket-booked" ? "/assets/svg/bottom-nav/ticket-active.svg" : "/assets/svg/bottom-nav/ticket.svg"}
+								src={path === "/reservations" || path === "/booking" || path === "/ticket-booked" ? "/assets/svg/bottom-nav/ticket-active.svg" : "/assets/svg/bottom-nav/ticket.svg"}
 								alt="ticket"
 							/>
 						</Link>
