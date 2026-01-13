@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import ScrollTop from "../../common/ScrollTop";
 import { Restaurant, ApiResponse, Spot, SpotsApiResponse } from "../../../types/api";
 import { useTranslation } from "react-i18next";
+import Footer from "../../../layouts/footers/Footer";
 
 const Products = () => {
 	const { t, i18n } = useTranslation();
@@ -289,7 +290,7 @@ const Products = () => {
 				</section>
 			</main>
 
-
+			<Footer />
 		</>
 	);
 };

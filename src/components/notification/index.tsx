@@ -4,6 +4,7 @@ import { authService } from "../../api/auth";
 import { useNotifications } from "../../context/NotificationContext";
 import { format } from "timeago.js";
 import toast from "react-hot-toast";
+import Footer from "../../layouts/footers/Footer";
 
 interface NotificationItem {
 	id: string;
@@ -134,6 +135,7 @@ const Notification = () => {
 					)}
 				</section>
 			</main>
+			<Footer />
 		</>
 	);
 };
