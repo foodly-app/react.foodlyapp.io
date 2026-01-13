@@ -47,6 +47,8 @@ import HelpSupport from "./components/profile/help-support";
 import SplashScreen from "./components/splash-screen";
 import Support from "./components/profile/support";
 import Language from "./components/profile/language";
+import Reservations from "./components/profile/reservations";
+import ReservationDetail from "./components/profile/reservation-detail";
 import { AuthProvider } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 
@@ -90,6 +92,9 @@ const router = createBrowserRouter([
   { path: "/service-location", element: <ServiceLocation /> },
   { path: "/ticket-booked", element: <TicketBooked /> },
   { path: "/ticket-detail", element: <TicketDetail /> },
+  { path: "/reservations", element: <Reservations /> },
+  { path: "/booking", element: <Reservations /> },
+  { path: "/reservation-detail/:id", element: <ReservationDetail /> },
   { path: "/tour-guide", element: <TourGuide /> },
   { path: "/notification", element: <Notification /> },
   { path: "/review", element: <Review /> },

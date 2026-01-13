@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
- 
+
 
 const Wishlist = () => {
 	return (
@@ -12,7 +12,7 @@ const Wishlist = () => {
 
 				<section className="all-place">
 					<div className="grid">
-						
+
 						<div className="place-card">
 							<Link to="/vacation-details">
 								<div className="image position-relative">
@@ -203,7 +203,7 @@ const Wishlist = () => {
 						</Link>
 					</li>
 					<li>
-						<Link to="/ticket-booked">
+						<Link to="/reservations">
 							<img src="/assets/svg/bottom-nav/ticket.svg" alt="ticket" />
 						</Link>
 					</li>

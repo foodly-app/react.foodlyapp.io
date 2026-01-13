@@ -3,7 +3,7 @@ import explore_data from "../../../data/explore-data";
 import { Link } from "react-router-dom";
 import InputRange from "../../../ui/InputRange";
 
- 
+
 
 // data
 const categories = [
@@ -13,7 +13,7 @@ const categories = [
 const perView = 6;
 
 const Explore = () => {
-	 
+
 	const maxPrice = 450;
 	const [priceValue, setPriceValue] = useState([0, maxPrice]);
 
@@ -129,7 +129,7 @@ const Explore = () => {
 						</Link>
 					</li>
 					<li>
-						<Link to="/ticket-booked">
+						<Link to="/reservations">
 							<img src="/assets/svg/bottom-nav/ticket.svg" alt="ticket" />
 						</Link>
 					</li>

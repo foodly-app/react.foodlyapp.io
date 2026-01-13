@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { initializeApp } from 'firebase/app';
+import { getApps, initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { authService } from '../api/auth';
 import { useAuth } from '../context/AuthContext';
@@ -13,40 +13,60 @@ export const useFcm = () => {
     const initializeFcm = async () => {
         if (!isAuthenticated) return;
         try {
-            // 1. Fetch Config
-            const settings = await authService.getNotificationSettings();
-            const { firebase_config, vapid_public_key } = settings;
+            console.log('Initializing FCM...');
 
-            // 2. Initialize Firebase
-            const app = initializeApp(firebase_config);
+            // 1. Fetch VAPID key from API (even if we hardcode config)
+            const response = await authService.getNotificationSettings();
+            const configData = response.data || response;
+            const vapid_public_key = configData.vapid_public_key;
+
+            // 2. Verified config from screenshot
+            const firebase_config = {
+                apiKey: "AIzaSyAyUbGaUvo2DzhC2WDLGNr5FliKw1r0wwg",
+                authDomain: "foodly-api-899d1.firebaseapp.com",
+                projectId: "foodly-api-899d1",
+                storageBucket: "foodly-api-899d1.firebasestorage.app",
+                messagingSenderId: "290878469832",
+                appId: "1:290878469832:web:3e58a59d44586921dc97fd",
+                measurementId: "G-0797R63VYD"
+            };
+
+            // Initialize app (one instance)
+            const app = getApps().length > 0 ? getApps()[0] : initializeApp(firebase_config);
             const messaging = getMessaging(app);
 
-            // 3. Register Service Worker (Dynamic from API)
+            // 3. Register Service Worker (proxied)
+            let swRegistration: ServiceWorkerRegistration | undefined;
             if ('serviceWorker' in navigator) {
                 try {
-                    const registration = await navigator.serviceWorker.register('https://api.foodly.pro/api/website/firebase-messaging-sw.js', {
-                        scope: '/'
-                    });
-                    console.log('SW registered:', registration);
+                    swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                    console.log('FCM Service Worker registered:', swRegistration.scope);
                 } catch (swError) {
-                    console.error('Service Worker registration failed:', swError);
+                    console.error('FCM Service Worker registration failed:', swError);
                 }
             }
 
             // 4. Check Permission and Get Token
-            // We only call getToken if permission is granted to avoid jumping the gun if using a modal
+            console.log('Current notification permission:', Notification.permission);
             if (Notification.permission === 'granted') {
-                const currentToken = await getToken(messaging, {
-                    vapidKey: vapid_public_key
-                });
-
-                if (currentToken) {
-                    await authService.saveFcmToken({
-                        token: currentToken,
-                        platform: 'web',
-                        device_name: navigator.userAgent
+                try {
+                    const currentToken = await getToken(messaging, {
+                        vapidKey: vapid_public_key,
+                        serviceWorkerRegistration: swRegistration
                     });
-                    console.log('FCM Token synced');
+
+                    if (currentToken) {
+                        await authService.saveFcmToken({
+                            token: currentToken,
+                            platform: 'web',
+                            device_name: navigator.userAgent
+                        });
+                        console.log('FCM Token synced successfully:', currentToken);
+                    } else {
+                        console.warn('No FCM token received. Check VAPID key and network.');
+                    }
+                } catch (tokenError) {
+                    console.error('Error getting FCM token:', tokenError);
                 }
             }
 
