@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getApps, initializeApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { authService } from '../api/auth';
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 export const useFcm = () => {
     const { isAuthenticated } = useAuth();
     const { incrementUnreadCount } = useNotifications();
+    const [hasPermission, setHasPermission] = useState(Notification.permission === 'granted');
 
     const initializeFcm = async () => {
         if (!isAuthenticated) return;
@@ -45,6 +46,7 @@ export const useFcm = () => {
             // 4. Check Permission and Get Token
             console.log('Current notification permission:', Notification.permission);
             if (Notification.permission === 'granted') {
+                setHasPermission(true);
                 try {
                     const currentToken = await getToken(messaging, {
                         vapidKey: vapid_public_key,
@@ -65,6 +67,8 @@ export const useFcm = () => {
                 } catch (tokenError) {
                     console.error('Error getting FCM token:', tokenError);
                 }
+            } else {
+                setHasPermission(false);
             }
 
             // 5. Handle Foreground Messages
@@ -104,14 +108,17 @@ export const useFcm = () => {
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 console.log('Notification permission granted');
+                setHasPermission(true);
                 await initializeFcm();
                 return true;
             } else {
                 console.log('Notification permission denied');
+                setHasPermission(false);
                 return false;
             }
         } catch (error) {
             console.error('Error requesting notification permission:', error);
+            setHasPermission(false);
             return false;
         }
     };
@@ -122,5 +129,6 @@ export const useFcm = () => {
         }
     }, [isAuthenticated]);
 
-    return { initializeFcm, requestPermission };
+    return { initializeFcm, requestPermission, hasPermission };
 };
+

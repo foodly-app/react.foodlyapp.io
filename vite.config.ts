@@ -13,7 +13,7 @@ export default defineConfig({
       '/firebase-messaging-sw.js': {
         target: 'https://api.foodly.pro',
         changeOrigin: true,
-        rewrite: (path) => '/api/website/firebase-messaging-sw.js'
+        rewrite: () => '/api/website/firebase-messaging-sw.js'
       }
     }
   }
