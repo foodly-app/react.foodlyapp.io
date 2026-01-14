@@ -36,8 +36,15 @@ export const useFcm = () => {
             let swRegistration: ServiceWorkerRegistration | undefined;
             if ('serviceWorker' in navigator) {
                 try {
-                    swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js?platform=react-web');
+                    // IMPORTANT: Service Worker MUST be served from the same origin
+                    // In production, the SW file should be in the build output
+                    swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js?platform=react-web', {
+                        scope: '/'
+                    });
                     console.log('FCM Service Worker registered with scope:', swRegistration.scope);
+
+                    // Wait for the service worker to be ready
+                    await navigator.serviceWorker.ready;
                 } catch (swError) {
                     console.error('FCM Service Worker registration failed:', swError);
                 }

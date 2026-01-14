@@ -19,7 +19,8 @@ let messaging = null;
 self.addEventListener('install', (event) => {
     console.log('[FCM SW] Service Worker installing...');
     event.waitUntil(
-        fetch(`/api/website/settings/notifications?platform=${platform}`)
+        // Fetch from production API directly (not using proxy)
+        fetch(`https://api.foodly.pro/api/website/settings/notifications?platform=${platform}`)
             .then(response => response.json())
             .then(data => {
                 if (data.firebase_config) {
