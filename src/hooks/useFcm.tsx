@@ -45,6 +45,15 @@ export const useFcm = () => {
 
                     // Wait for the service worker to be ready
                     await navigator.serviceWorker.ready;
+
+                    // Send Firebase config to Service Worker
+                    if (navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'FIREBASE_CONFIG',
+                            config: firebase_config
+                        });
+                        console.log('Firebase config sent to Service Worker');
+                    }
                 } catch (swError) {
                     console.error('FCM Service Worker registration failed:', swError);
                 }
@@ -55,21 +64,26 @@ export const useFcm = () => {
             if (Notification.permission === 'granted') {
                 setHasPermission(true);
                 try {
-                    const currentToken = await getToken(messaging, {
-                        vapidKey: vapid_public_key,
-                        serviceWorkerRegistration: swRegistration
-                    });
-
-                    if (currentToken) {
-                        // Send token to backend
-                        await authService.saveFcmToken({
-                            token: currentToken,
-                            platform: 'web',
-                            device_name: navigator.userAgent
+                    // Ensure service worker is fully active before getting token
+                    if (swRegistration?.active) {
+                        const currentToken = await getToken(messaging, {
+                            vapidKey: vapid_public_key,
+                            serviceWorkerRegistration: swRegistration
                         });
-                        console.log('FCM Token synced successfully:', currentToken);
+
+                        if (currentToken) {
+                            // Send token to backend
+                            await authService.saveFcmToken({
+                                token: currentToken,
+                                platform: 'web',
+                                device_name: navigator.userAgent
+                            });
+                            console.log('FCM Token synced successfully:', currentToken);
+                        } else {
+                            console.warn('No FCM token received. Check VAPID key and network.');
+                        }
                     } else {
-                        console.warn('No FCM token received. Check VAPID key and network.');
+                        console.warn('Service Worker not active yet, will retry on next page load');
                     }
                 } catch (tokenError) {
                     console.error('Error getting FCM token:', tokenError);

@@ -11,31 +11,39 @@ console.log('[FCM SW] Service Worker initialized for platform:', platform);
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
-// Fetch Firebase configuration from backend
+// Initialize Firebase when config is received from main app
 let firebaseApp = null;
 let messaging = null;
+
+// Listen for config from main app
+self.addEventListener('message', (event) => {
+    console.log('[FCM SW] Message received from main thread:', event.data);
+
+    if (event.data && event.data.type === 'FIREBASE_CONFIG') {
+        try {
+            const firebaseConfig = event.data.config;
+            console.log('[FCM SW] Firebase config received from main app');
+
+            if (!firebaseApp) {
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                messaging = firebase.messaging();
+                console.log('[FCM SW] Firebase initialized');
+            }
+        } catch (error) {
+            console.error('[FCM SW] Failed to initialize Firebase:', error);
+        }
+    }
+
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
 
 // Initialize Firebase when service worker is installed
 self.addEventListener('install', (event) => {
     console.log('[FCM SW] Service Worker installing...');
-    event.waitUntil(
-        // Fetch from production API directly (not using proxy)
-        fetch(`https://api.foodly.pro/api/website/settings/notifications?platform=${platform}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.firebase_config) {
-                    console.log('[FCM SW] Firebase config fetched successfully');
-                    firebaseApp = firebase.initializeApp(data.firebase_config);
-                    messaging = firebase.messaging();
-                    console.log('[FCM SW] Firebase initialized');
-                } else {
-                    console.error('[FCM SW] No firebase_config in response');
-                }
-            })
-            .catch(error => {
-                console.error('[FCM SW] Failed to fetch Firebase config:', error);
-            })
-    );
+    // Skip waiting to activate immediately
+    self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -97,13 +105,4 @@ self.addEventListener('notificationclick', (event) => {
                 }
             })
     );
-});
-
-// Handle messages from the main thread
-self.addEventListener('message', (event) => {
-    console.log('[FCM SW] Message received from main thread:', event.data);
-
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
 });
